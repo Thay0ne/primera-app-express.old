@@ -1,6 +1,28 @@
 const express = require('express');
 const app = express();
 
+app.use(express.urlencoded());
+
+app.get('/', (req, res) => {
+  res.send(
+  '<form action="/myapp" method="post">' +
+  '<label for="name">'+
+  '<input type="text" id="name" name="name">' +
+  '<button type="submit">Enviar</button>' +
+  '</form>'
+  );
+});
+
+app.post('/myapp', (req, res) => {
+  res.send('<h1>Hola ' + req.body.name + '!</h1>');
+});
+
+app.listen(3000, () => console.log('Listening on port 3000!'));
+
+/*SALUDAME2
+const express = require('express');
+const app = express();
+
 app.get('/makers/:name', (req, res) => {
 
   function capitalizeFirstLetter(name) {
