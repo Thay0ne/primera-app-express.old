@@ -1,5 +1,17 @@
 const express = require('express');
 const app = express();
+const useragent = require('express-useragent');
+
+app.use(useragent.express());
+app.get('/', function(req, res){
+  res.send(req.useragent);
+});
+
+app.listen(3000, () => console.log('Listening on port 3000!'));
+
+/* SALUDAME3
+const express = require('express');
+const app = express();
 
 app.use(express.urlencoded());
 
