@@ -1,5 +1,118 @@
 const express = require('express');
 const app = express();
+var mongoose = require("mongoose");
+mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/mongo-1', { useNewUrlParser: true, useUnifiedTopology: true });
+
+var schema = mongoose.Schema({
+  date: {type: Date, default: Date.now()},
+  name: {type: String, default: "Anonimo" }
+
+});
+
+var Visitor = mongoose.model("Visitor", schema);
+
+app.get('/', function(req, res){
+  Visitor.create({ name: req.query.name }, function(err) {
+    if (err) return console.error(err);
+  });
+  res.send('<h1>"El visitante fue almacenado con éxito"</h1>' + req.query.name);
+});
+
+app.listen(3000, () => console.log('Listening on port 3000!'));
+
+/*PRACTICANDO MONGODB
+const express = require('express');
+const app = express();
+
+var mongoose = require("mongoose");
+mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true, useUnifiedTopology: true});
+
+mongoose.connection.on("error", function(e) { console.error(e); });
+
+// definimos el schema
+var schema = mongoose.Schema({
+  title: String,
+  body: String,
+  published: { type: Boolean, default: false }
+});
+
+// definimos el modelo
+var Article = mongoose.model("Article", schema);
+
+Article.create({ title: "Artículo 2", body: "Cuerpo del artículo" }, function(err) {
+  if (err) return console.error(err);
+});
+
+Article.insertMany([
+  { title: "Artículo 3", body: "Cuerpo del artículo" },
+  { title: "Artículo 4", body: "Cuerpo del artículo" }
+], function(err) {
+  if (err) return console.error(err);
+});
+
+Article.find(function(err, articles) {
+  if (err) return console.error(err);
+  console.log(articles);
+});
+
+Article.find({ article: "El título" }, function(err, articles) {
+  if (err) return console.error(err);
+  console.log(articles);
+});
+
+app.listen(3000, () => console.log('Listening on port 3000!'));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*const express = require('express');
+const app = express();
+
+app.use(express.urlencoded());
+
+app.get('/', (req, res) => {
+  res.send(
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
+  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'
+  );
+});
+
+app.post('/myapp', (req, res) => {
+  res.send('<h1>Hola ' + req.body.name + '!</h1>');
+});
+
+/*ENCABEZADOS
+const express = require('express');
+const app = express();
 
 app.get('/', function(req, res){
     res.send(req.get('User-Agent'));
