@@ -5,7 +5,7 @@ mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/mongo-1',
 
 var schema = mongoose.Schema({
   date: {type: Date, default: Date.now()},
-  name: {type: String, default: "Anonimo" }
+  name: {type: String, default: "Anónimo" }
 
 });
 
