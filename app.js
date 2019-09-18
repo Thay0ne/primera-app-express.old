@@ -4,6 +4,52 @@ var mongoose = require("mongoose");
 mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/mongo-1', { useNewUrlParser: true, useUnifiedTopology: true });
 
 var schema = mongoose.Schema({
+  name: {type: String, default: "Anónimo" },
+  count: {type: Number, default: 1 }
+});
+
+var Visitor = mongoose.model("Visitor", schema);
+
+app.get('/', function(req, res){
+  if (req.query.name) {
+    Visitor.find({ name: req.query.name }, function(err, visitante) {
+  if (err) return console.error(err);
+  if(visitante){
+    Visitor.update({ name: req.query.name }, function(err) {
+  if (err) return console.error(err);
+});
+  }else{
+    Visitor.create({ name: req.query.name }, function(err) {
+      if (err) return console.error(err);
+    });
+  }
+});
+
+  }
+
+
+
+
+res.send(
+    '<table style="width:100%">'+
+    '<tr>' +
+    '<th>_id</th>' +
+    '<th>name</th>' +
+    '<th>count</th>' +
+    '</tr>' +
+    '</table>' + req.query.name
+   );
+});
+
+app.listen(3000, () => console.log('Listening on port 3000!'));
+
+/* Visitantes
+const express = require('express');
+const app = express();
+var mongoose = require("mongoose");
+mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/mongo-1', { useNewUrlParser: true, useUnifiedTopology: true });
+
+var schema = mongoose.Schema({
   date: {type: Date, default: Date.now()},
   name: {type: String, default: "Anónimo" }
 
@@ -61,54 +107,6 @@ Article.find({ article: "El título" }, function(err, articles) {
 });
 
 app.listen(3000, () => console.log('Listening on port 3000!'));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*const express = require('express');
-const app = express();
-
-app.use(express.urlencoded());
-
-app.get('/', (req, res) => {
-  res.send(
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+
-  '<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'+'<p></p>'
-  );
-});
-
-app.post('/myapp', (req, res) => {
-  res.send('<h1>Hola ' + req.body.name + '!</h1>');
-});
 
 /*ENCABEZADOS
 const express = require('express');
