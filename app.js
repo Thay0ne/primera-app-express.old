@@ -28,7 +28,7 @@ app.get('/', function(req, res){
   }
 
 res.send(
-    '<table style="width:100%">'+
+    '<table>'+
     '<tr>' +
     '<td>_id</td>' +
     '<td>name</td>' +
