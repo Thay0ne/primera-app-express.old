@@ -31,7 +31,7 @@ res.send(
     '<table>'+
     '<tr>' +
     '<td>_id</td>' +
-    '<td>name</td>' +
+    '<td>Anónimo</td>' +
     '<td>count</td>' +
     '</tr>' +
     '</table>' + req.query.name
