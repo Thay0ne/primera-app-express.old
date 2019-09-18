@@ -27,15 +27,17 @@ app.get('/', function(req, res){
 
   }
 
-
-
-
 res.send(
     '<table style="width:100%">'+
     '<tr>' +
     '<th>_id</th>' +
     '<th>name</th>' +
     '<th>count</th>' +
+    '</tr>' +
+    '<tr>' +
+    '<td></td>' +
+    '<td></td>' +
+    '<td></td>' +
     '</tr>' +
     '</table>' + req.query.name
    );
