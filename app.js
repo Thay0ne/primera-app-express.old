@@ -33,7 +33,7 @@ res.send(
     '<td>_id</td>' +
     '<td>name</td>' +
     '<td>count</td>' +
-    '<tr>' +
+    '</tr>' +
     '</table>' + req.query.name
    );
 });
