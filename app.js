@@ -26,14 +26,15 @@ app.get('/', function(req, res){
 });
 
   }
-
 res.send(
-    '<table>'+
+    '<table style="width:100%">'+
+    '<thead>'+
     '<tr>' +
-    '<td>_id</td>' +
-    '<td>Anónimo</td>' +
-    '<td>count</td>' +
+    '<th>_id</th>' +
+    '<th>name</th>' +
+    '<th>count</th>' +
     '</tr>' +
+    '</thead>'+
     '</table>' + req.query.name
    );
 });
