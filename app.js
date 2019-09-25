@@ -3,70 +3,124 @@ const app = express();
 var mongoose = require("mongoose");
 mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/mongo-1', { useNewUrlParser: true, useUnifiedTopology: true });
 
+app.use(express.urlencoded());
+
 var schema = mongoose.Schema({
-  name: {type: String, default: "Anónimo" },
-  count: {type: Number, default: 1 }
+  name: { type: String },
+  email: { type: String },
+  password: { type: String },
+});
+
+var Visitor = mongoose.model("Visitor", schema);
+
+app.get('/register', function(req, res){
+  res.send(
+    '<form action="/register" method="post">' +
+    '<label for="name">Name' +
+    '<input type="text" id="name" name="name"></label>' +
+    '<label for="email">Email' +
+    '<input type="text" id="email" name="email"></label>' +
+    '<label for="password">Password' +
+    '<input type="password" id="password" name="password"></label>' +
+    '<button type="submit">Registrarse</button>' +
+    '</form>'
+  );
+
+});
+
+app.post('/register', (req, res) => {
+  Visitor.create({ name: req.body.name, email: req.body.email, password: req.body.password }, function(err) {
+  if (err) return console.error(err);
+  });
+  res.redirect("/");
+});
+
+app.get('/', function(req, res){
+  Visitor.find({},function(err, docs){
+    var tabla = '<a href="/register">Registro</a><table><thead><th></th><th></th></thead><tbody>';
+    docs.forEach(element =>{
+      tabla+='<tr><td>'+element.name+'</td><td>'+element.email+'</td></tr>';
+    })
+    tabla+="</tbody></table>";
+    res.send(tabla);
+  })
+
+
+});
+
+app.listen(3000, () => console.log('Listening on port 3000!'));
+
+
+/* VISITANTES RECURRENTES
+const express = require('express');
+const app = express();
+var mongoose = require("mongoose");
+mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/mongo-1', { useNewUrlParser: true, useUnifiedTopology: true });
+
+var schema = mongoose.Schema({
+name: {type: String, default: "Anónimo" },
+count: {type: Number, default: 1 }
 });
 
 var Visitor = mongoose.model("Visitor", schema);
 
 function tablaHtml(datos) {
-  var tabla = '<table>'+
-  '<thead>'+
-  '<tr>' +
-  '<th>_id</th>' +
-  '<th>name</th>' +
-  '<th>count</th>' +
-  '</tr>' +
-  '</thead>'+
-  '<tbody>';
-  for (var i = 0; i < datos.length; i++) {
-    tabla += '<tr>'+
-    '<td>'+datos[i]._id+'</td>' +
-    '<td>'+datos[i].name+'</td>' +
-    '<td>'+datos[i].count+'</td>' +
-    '</tr>';
-  }
-  tabla += '</tbody>' + '</table>';
-  return tabla;
+var tabla = '<table>'+
+'<thead>'+
+'<tr>' +
+'<th>_id</th>' +
+'<th>name</th>' +
+'<th>count</th>' +
+'</tr>' +
+'</thead>'+
+'<tbody>';
+for (var i = 0; i < datos.length; i++) {
+tabla += '<tr>'+
+'<td>'+datos[i]._id+'</td>' +
+'<td>'+datos[i].name+'</td>' +
+'<td>'+datos[i].count+'</td>' +
+'</tr>';
+}
+tabla += '</tbody>' + '</table>';
+return tabla;
 }
 app.get('/', function(req, res){
 
-  if (req.query.name) {
-    Visitor.findOne({ name: req.query.name }, function(err, visitante) {
-      if (err) return console.error(err);
-      if (visitante){
-        visitante.count += 1;
+if (req.query.name) {
+Visitor.findOne({ name: req.query.name }, function(err, visitante) {
+if (err) return console.error(err);
+if (visitante){
+visitante.count += 1;
 
-        visitante.save(function(err) {
-          if (err) return console.error(err);
-          Visitor.find(function(err, visitantes) {
-            if (err) return console.error(err);
-            res.send(tablaHtml(visitantes));
-          });
-        });
-      }
-      else {
-        Visitor.create({ name: req.query.name }, function(err) {
-          if (err) return console.error(err);
-          Visitor.find(function(err, visitantes) {
-            if (err) return console.error(err);
-            res.send(tablaHtml(visitantes));
-          });
-        });
-      }
+visitante.save(function(err) {
+if (err) return console.error(err);
+Visitor.find(function(err, visitantes) {
+if (err) return console.error(err);
+res.send(tablaHtml(visitantes));
+});
+});
+}
+else {
+Visitor.create({ name: req.query.name }, function(err) {
+if (err) return console.error(err);
+Visitor.find(function(err, visitantes) {
+if (err) return console.error(err);
+res.send(tablaHtml(visitantes));
+});
+});
+}
 
-    });
+});
 
-  } else {
-    Visitor.create({ name: "Anónimo" }, function(err) {
-      if (err) return console.error(err);
-      Visitor.find(function(err, visitantes) {
-        if (err) return console.error(err);
-        res.send(tablaHtml(visitantes));
-      });
-    });
-  }
+} else {
+Visitor.create({ name: "Anónimo" }, function(err) {
+if (err) return console.error(err);
+Visitor.find(function(err, visitantes) {
+if (err) return console.error(err);
+res.send(tablaHtml(visitantes));
+});
+});
+}
 
 });
 app.listen(3000, () => console.log('Listening on port 3000!'));
