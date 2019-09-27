@@ -87,6 +87,9 @@ app.post('/login', async(req, res) => {
 });
 
 app.get('/', function(req, res){
+  if (!req.session.userId) {
+    return res.redirect("/login");
+  }
   Visitor.find({},function(err, docs){
     var tabla = '<a href="/logout">Logout</a><table><thead><th></th><th></th></thead><tbody>';
     docs.forEach(element =>{
