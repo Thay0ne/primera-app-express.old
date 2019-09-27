@@ -1,15 +1,36 @@
 const express = require('express');
 const app = express();
 var mongoose = require("mongoose");
+var bcrypt = require('bcrypt');
+var cookieSession = require('cookie-session');
 mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/mongo-1', { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(express.urlencoded());
+
+app.use(cookieSession({
+  secret: "Login",
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 var schema = mongoose.Schema({
   name: { type: String },
   email: { type: String },
   password: { type: String },
 });
+
+schema.statics.authenticate = async (email, password) => {
+  // buscamos el usuario utilizando el email
+  const user = await mongoose.model("Visitor").findOne({ email: email });
+
+  if (user) {
+    // si existe comparamos la contraseña
+    const match = await bcrypt.compare(password, user.password);
+    return match ? user : null;
+  }
+
+  return null;
+};
 
 var Visitor = mongoose.model("Visitor", schema);
 
@@ -29,15 +50,45 @@ app.get('/register', function(req, res){
 });
 
 app.post('/register', (req, res) => {
-  Visitor.create({ name: req.body.name, email: req.body.email, password: req.body.password }, function(err) {
-  if (err) return console.error(err);
-  });
-  res.redirect("/");
+  bcrypt.hash(req.body.password, 10).then(function(hash) {
+    Visitor.create({ name: req.body.name, email: req.body.email, password: hash }, function(err) {
+      if (err) return console.error(err);
+      res.redirect("/login");
+    });
+  })
+});
+
+app.get("/login", function (req, res) {
+  res.send(
+    '<form action="/login" method="post">' +
+    '<label for="email">Email' +
+    '<input type="text" id="email" name="email"></label>' +
+    '<label for="password">Password' +
+    '<input type="password" id="password" name="password"></label>' +
+    '<button type="submit">Login</button>' +
+    '</form>'
+  );
+});
+
+app.post('/login', async(req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  try {
+    const user = await Visitor.authenticate(email, password);
+    if (user) {
+      req.session.userId = user._id; // acá guardamos el id en la sesión
+      return res.redirect("/");
+    } else {
+      return res.redirect("/login");
+    }
+  } catch (e) {
+    console.log("Error", e);
+  }
 });
 
 app.get('/', function(req, res){
   Visitor.find({},function(err, docs){
-    var tabla = '<a href="/register">Registro</a><table><thead><th></th><th></th></thead><tbody>';
+    var tabla = '<a href="/logout">Logout</a><table><thead><th></th><th></th></thead><tbody>';
     docs.forEach(element =>{
       tabla+='<tr><td>'+element.name+'</td><td>'+element.email+'</td></tr>';
     })
@@ -45,7 +96,11 @@ app.get('/', function(req, res){
     res.send(tabla);
   })
 
+});
 
+app.get('/logout', function(req, res){
+  req.session.userId = null
+  return res.redirect("/login");
 });
 
 app.listen(3000, () => console.log('Listening on port 3000!'));
